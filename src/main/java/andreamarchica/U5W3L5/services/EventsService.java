@@ -3,6 +3,7 @@ package andreamarchica.U5W3L5.services;
 import andreamarchica.U5W3L5.entities.Event;
 import andreamarchica.U5W3L5.exceptions.NotFoundException;
 import andreamarchica.U5W3L5.payloads.events.NewEventDTO;
+import andreamarchica.U5W3L5.repositories.BookingsRepository;
 import andreamarchica.U5W3L5.repositories.EventsRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -23,6 +24,9 @@ public class EventsService {
     EventsRepository eventsRepository;
     @Autowired
     Cloudinary cloudinary;
+    @Autowired
+    private BookingsRepository bookingsRepository;
+
     public Page<Event> getEvents(int page, int size, String sort) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
@@ -68,5 +72,14 @@ public class EventsService {
     }
     public Event findByTitle(String title) throws NotFoundException {
         return eventsRepository.findByTitle(title).orElseThrow(() -> new NotFoundException("L'evento chiamato " + title + " non trovato!"));
+    }
+    public Event updateAvailablePlaces(UUID eventId) {
+        Event event = eventsRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Evento non trovato con ID: " + eventId));
+
+        int bookedPlaces = bookingsRepository.countByEvent(event);
+        int availablePlaces = event.getAvailablePlaces() - bookedPlaces;
+        event.setAvailablePlaces(availablePlaces);
+        return eventsRepository.save(event);
     }
 }

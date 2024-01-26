@@ -15,4 +15,6 @@ public interface BookingsRepository extends JpaRepository <Booking, UUID> {
     List<Booking> findByUser(User user);
     boolean existsByEvent(Event event);
     Optional<Booking> findByEvent(Event event);
+    int countByEvent(Event event);
 }
+

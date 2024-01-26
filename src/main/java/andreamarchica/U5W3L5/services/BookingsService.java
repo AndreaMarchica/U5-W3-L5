@@ -30,6 +30,8 @@ public class BookingsService {
     private BookingsRepository bookingsRepository;
     @Autowired
     private EventsRepository eventsRepository;
+    @Autowired
+    private EventsService eventsService;
     public Page<Booking> getUsers(int page, int size, String sort) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
@@ -44,15 +46,18 @@ public class BookingsService {
 
         Booking newBooking = new Booking();
         newBooking.setEvent(event);
+        newBooking.setBookingDate(LocalDate.now());
 
-        //Trovata palesemente in rete dopo un pomeriggio di bestemmie
+        //Trovata palesemente in rete dopo un pomeriggio di bestemmie molto offensive
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof User) {
+       // if (authentication != null && authentication.getPrincipal() instanceof User) {
             User currentUser = (User) authentication.getPrincipal();
             newBooking.setUser(currentUser);
-        } else newBooking.setUser(null);
-        newBooking.setBookingDate(LocalDate.now());
-        return bookingsRepository.save(newBooking);
+        //} else newBooking.setUser(null);
+
+        bookingsRepository.save(newBooking);
+        eventsService.updateAvailablePlaces(event.getId());
+        return newBooking;
     }
 
     public Booking findById(UUID id) {
@@ -70,4 +75,5 @@ public class BookingsService {
         found.setUser(body.getUser());
         return bookingsRepository.save(found);
     }
+
 }
