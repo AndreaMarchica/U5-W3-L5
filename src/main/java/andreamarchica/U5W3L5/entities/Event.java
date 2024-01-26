@@ -27,6 +27,13 @@ public class Event {
     @JsonIgnore
     List<Booking> bookingList;
 
+    public Event() {
+    }
+
+    public Event(String title) {
+        this.title = title;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }

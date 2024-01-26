@@ -66,4 +66,7 @@ public class EventsService {
         found.setEventImage(eventImage);
         return eventsRepository.save(found);
     }
+    public Event findByTitle(String title) throws NotFoundException {
+        return eventsRepository.findByTitle(title).orElseThrow(() -> new NotFoundException("L'evento chiamato " + title + " non trovato!"));
+    }
 }
